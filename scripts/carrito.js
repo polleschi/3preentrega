@@ -8,14 +8,35 @@ function rellenarCarrito(arrayCarrito)
     for (let producto of arrayCarrito)
     {   
         let row = document.createElement("tr");
-        row.innerHTML = `<td class="tdChart">${producto.nombre}</td> <td class="tdChart">$${producto.precio}</td> <td class="tdChart">${producto.cantidad}</td> <td class="tdChart">${producto.subtotal}</td><td><button class="linkCompra eliminarProducto">Eliminar</button></td></td>`
+        row.innerHTML = `<td class="tdChart">${producto.nombre}</td> <td class="tdChart">$${producto.precio}</td> <td class="tdChart">${producto.cantidad}</td> <td class="tdChart">${producto.subtotal}</td><td><button class="linkCompra eliminarProducto">Eliminar</button></td><td><button class="linkCompra" style="color: grey;" id="conversor">$Convertir</button></td>`
         tbody.appendChild(row);
 
+    let botonConvertidor = document.getElementById("conversor");
     let botonComprar = document.getElementById("comprarTodo");
     
     botonComprar.addEventListener("click", ()=>{
         comprar()
     })
+    let myHeaders = new Headers();
+    myHeaders.append("apikey", "hxU5fFuqXfj6d0WsAxJgQcLYEvwJMcQM");
+
+    let requestOptions = {
+        method: 'GET',
+        redirect: 'follow',
+        headers: myHeaders
+    };
+
+    fetch(`https://api.apilayer.com/exchangerates_data/convert?to=ARS&from=USD&amount=${producto.subtotal}` , requestOptions)
+        .then(response => response.json())
+        .then((result) => 
+            {
+                console.log(result)
+                console.log(result.result)
+            botonConvertidor.addEventListener("click", ()=>{
+                swal("La conversion es $ARS " + result.result);
+            })
+        })
+        .catch(error => console.log('error', error))
     }
 }
 
@@ -38,4 +59,15 @@ function eliminarProducto(e){
 function comprar(){
     swal ("Su compra se realizo con exito", "Sera redirigido a la pagina principal", "success")
     localStorage.clear();
+    
+    let contador = 1
+    let intervalo = setInterval(()=>{
+    contador ++
+    if(contador==5)
+    {
+        clearInterval(intervalo)
+        location.href = "../index.html"
+    }
+    
+}, 1000)
 }
